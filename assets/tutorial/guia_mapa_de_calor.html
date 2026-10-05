@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guia — Mapa de Calor (passo a passo)</title>
+  <style>
+    :root{
+      --bg:#edf3f8;
+      --card:#ffffff;
+      --text:#1a2433;
+      --muted:#5c6b7a;
+      --blue:#2f90e8;
+      --blue-dark:#0d5db8;
+      --blue-soft:#eaf5ff;
+      --green:#22b455;
+      --green-dark:#16803b;
+      --line:#d9e6f2;
+      --shadow:0 10px 28px rgba(16, 48, 87, 0.08);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+      --radius-pill:999px;
+    }
+
+    *{box-sizing:border-box}
+
+    html, body{
+      height:100%;
+      margin:0;
+      scroll-behavior:smooth;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg, #f4f8fc 0%, #edf3f8 100%);
+      color:var(--text);
+      line-height:1.55;
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns:520px 1fr;
+      min-height:100%;
+      gap:22px;
+      padding:22px;
+      max-width:1880px;
+      margin:0 auto;
+      align-items:start;
+    }
+
+    .panel{
+      position:sticky;
+      top:18px;
+      align-self:start;
+    }
+
+    .hero,
+    .box,
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      border-radius:var(--radius-xl);
+      padding:26px 26px 22px;
+      margin-bottom:18px;
+    }
+
+    .panel h1{
+      margin:0 0 12px;
+      font-size:28px;
+      line-height:1.15;
+      font-weight:900;
+      color:#101820;
+      letter-spacing:-0.02em;
+    }
+
+    .intro{
+      margin:0;
+      font-size:15px;
+      color:#4f5f6f;
+      max-width:440px;
+    }
+
+    .box{
+      border-radius:var(--radius-xl);
+      padding:22px;
+      margin-bottom:18px;
+    }
+
+    .box h2{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 16px;
+      font-size:18px;
+      font-weight:900;
+      color:var(--blue-dark);
+    }
+
+    .box h2::before{
+      content:"";
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--blue), #59c0ff);
+      box-shadow:0 0 0 6px rgba(47, 144, 232, 0.10);
+      flex:0 0 auto;
+    }
+
+    .box ul{margin:0;padding-left:22px}
+    .box li{margin:12px 0;font-size:15px;color:#334255}
+
+    .mono{
+      display:inline-block;
+      padding:3px 12px;
+      border-radius:var(--radius-pill);
+      background:#fff;
+      border:1px solid #dbe7f2;
+      box-shadow:0 2px 5px rgba(0,0,0,0.04);
+      color:#1d2a39;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:12px;
+      vertical-align:middle;
+      white-space:nowrap;
+    }
+
+    .callout{
+      margin-top:16px;
+      background:linear-gradient(135deg, #22b455 0%, #1c9a49 100%);
+      color:#06240b;
+      border-radius:20px;
+      padding:16px 18px;
+      font-size:14px;
+      border:1px solid rgba(255,255,255,0.55);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .callout strong{color:#06240b}
+
+    .toc{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:0;
+    }
+
+    .toc a{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:12px 18px;
+      border-radius:var(--radius-pill);
+      border:1px solid #d8e5f0;
+      background:#fff;
+      color:#1f2937;
+      font-size:14px;
+      font-weight:600;
+      text-decoration:none;
+      transition:all .15s ease;
+      box-shadow:0 4px 10px rgba(20, 63, 111, 0.05);
+    }
+
+    .toc a:hover{
+      transform:translateY(-2px);
+      border-color:#b9d8f4;
+      background:#f8fcff;
+      box-shadow:0 8px 18px rgba(20, 63, 111, 0.10);
+    }
+
+    .muted{
+      color:#556476;
+      font-size:13px;
+    }
+
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .card{
+      scroll-margin-top:24px;
+      border-radius:28px;
+      padding:16px;
+      overflow:hidden;
+    }
+
+    .cardHead{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      border-radius:20px;
+      padding:14px 16px;
+      background:linear-gradient(135deg, #22b455 0%, #1b9a49 100%);
+      color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.20);
+      margin-bottom:16px;
+    }
+
+    .cardTitle{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .stepnum{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#eef7ff;
+      color:var(--blue-dark);
+      font-size:22px;
+      font-weight:900;
+      flex:0 0 auto;
+      box-shadow:0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h3{
+      margin:0;
+      font-size:19px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:-0.01em;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns:1.05fr 0.95fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .textPane{
+      background:linear-gradient(180deg, #f4fbff 0%, #eef7ff 100%);
+      border:1px solid #d9ebfb;
+      border-radius:22px;
+      padding:22px 22px 18px;
+    }
+
+    .small-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      color:var(--blue-dark);
+      font-size:12px;
+      font-weight:800;
+      border:1px solid #d4e8fb;
+    }
+
+    .textPane ul{margin:0;padding-left:24px}
+    .textPane li{margin:12px 0;font-size:15px;color:#274158}
+    .textPane strong{color:var(--blue-dark)}
+
+    figure{
+      margin:0;
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      border:1px solid #dce9f3;
+      border-radius:24px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:310px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+
+    figure img{
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      border-radius:16px;
+      display:block;
+      background:#fff;
+      border:1px solid #e2ecf5;
+      box-shadow:0 8px 18px rgba(26, 62, 99, 0.08);
+    }
+
+    figcaption{
+      padding-top:12px;
+      font-size:13px;
+      color:#617286;
+    }
+
+    details{
+      margin-top:12px;
+      border:1px solid #dce9f3;
+      border-radius:18px;
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      overflow:hidden;
+    }
+
+    summary{
+      cursor:pointer;
+      padding:14px 16px;
+      font-weight:900;
+      color:var(--blue-dark);
+      list-style:none;
+    }
+
+    summary::-webkit-details-marker{display:none}
+
+    details > div{
+      padding:0 16px 16px;
+      color:#2d4257;
+    }
+
+    details li{color:#2d4257}
+    details strong{color:#1a2433}
+
+    .btn{
+      font:inherit;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      background:#fff;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .btn-primary{background:#1E90FF;border-color:#1E90FF;color:#fff}
+    .btn-outline{background:#fff;color:#111;border-color:#ccc}
+
+    @media (max-width: 1280px){
+      .app{grid-template-columns:1fr}
+      .panel{position:static}
+    }
+
+    @media (max-width: 980px){
+      .app{padding:14px;gap:16px}
+      .split{grid-template-columns:1fr}
+      .hero,.box,.card{border-radius:20px}
+      .panel h1{font-size:24px}
+      .card h3{font-size:17px}
+      figure{min-height:220px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <section class="hero">
+      <h1>Guia — Mapa de Calor</h1>
+      <p class="intro">Passo a passo para criar mapas e exportar PPTX dentro do aplicativo.</p>
+    </section>
+
+    <section class="box">
+      <h2>Pré-requisitos</h2>
+      <ul>
+        <li>Relatório Descritivo Quantitativo na pasta <span class="mono">Relatório e Apresentações</span>.</li>
+        <li>KMLs na pasta do projeto e com nomes <strong>idênticos</strong> aos do relatório. Se não baterem, renomeie.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Dica:</strong> se uma região não pintar, quase sempre é divergência de nome do KML.
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>Sumário</h2>
+      <nav class="toc" aria-label="Sumário">
+        <a href="#passo1">1) Importar Excel e KML</a>
+        <a href="#passo2">2) Configurações visuais</a>
+        <a href="#passo3">3) Caso e região</a>
+        <a href="#passo4">4) Segmento</a>
+        <a href="#passo5">5) Base e cálculos</a>
+        <a href="#passo6">6) Pintura</a>
+        <a href="#passo7">7) Numeração</a>
+        <a href="#passo8">8) Fila e exportação</a>
+        <a href="#resultado">Resultado</a>
+      </nav>
+    </section>
+
+    <p class="muted">
+      Observação: este guia usa imagens do próprio app. Garanta que o caminho
+      <span class="mono">assets/tutorial/</span> esteja acessível no WebEngine via baseUrl.
+    </p>
+  </aside>
+
+  <main class="content">
+
+    <section class="card" id="passo1">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">1</span>
+          <h3>Importar o relatório (Excel) e os KMLs</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Etapa inicial</div>
+          <ul>
+            <li>Clique em <strong>Importar Excel</strong> e selecione o <strong>Relatório Descritivo Quantitativo</strong>.</li>
+            <li>Depois, em <strong>Importar KML (vários)</strong>, clique em <strong>Choose Files</strong> e selecione todos os KMLs necessários.</li>
+            <li><strong>Checagem importante:</strong> o nome do arquivo KML precisa <strong>coincidir</strong> com o nome das regiões usadas no relatório.</li>
+          </ul>
+          <div class="callout">
+            <strong>Se der problema:</strong> revise nomes, acentos, espaços e se você selecionou todos os KMLs.
+          </div>
+        </div>
+        <figure>
+          <img src="assets/tutorial/01_imports.png" alt="Passo 1: Importar Excel e KMLs" />
+          <figcaption>① Importar o relatório • ② Importar os KMLs</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo2">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">2</span>
+          <h3>Configurações visuais</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Ajustes de visual</div>
+          <ul>
+            <li>Em <strong>Fundo</strong>, selecione <strong>Satélite (Esri)</strong>.</li>
+            <li>Defina a <strong>Opacidade das cores</strong> em <strong>83</strong>.</li>
+            <li>Ajuste bordas e tamanho dos números conforme a necessidade do mapa.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/tutorial/02_config_visuais.png" alt="Passo 2: Configurações visuais" />
+          <figcaption>① Fundo = Satélite (Esri) • ② Opacidade = 83</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo3">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">3</span>
+          <h3>Selecionar o caso e conferir a tabela correta</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Validação da leitura</div>
+          <ul>
+            <li>Escolha o <strong>Caso</strong> e a <strong>Região</strong> que precisa mapear.</li>
+            <li>Abra o relatório e <strong>confira se o programa está lendo a tabela certa</strong>.</li>
+            <li>Use o campo <strong>Header</strong> para identificar a linha onde a tabela começa.</li>
+            <li>Confirme se a <strong>região</strong> exibida é exatamente a desejada.</li>
+          </ul>
+          <div class="callout">
+            <strong>Regra de ouro:</strong> valide o caso no relatório antes de pintar para evitar retrabalho.
+          </div>
+        </div>
+        <figure>
+          <img src="assets/tutorial/03_casos.png" alt="Passo 3: Caso e região" />
+          <figcaption>① Selecionar Caso/Região • ② Conferir Header/Base</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo4">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">4</span>
+          <h3>Selecionar o segmento</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Filtro do mapa</div>
+          <ul>
+            <li>Depois de escolher o caso, selecione o <strong>Segmento</strong> desejado.</li>
+            <li>Confirme se o segmento exibido corresponde exatamente ao recorte da análise.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/tutorial/04_segmento.png" alt="Passo 4: Segmento" />
+          <figcaption>① Escolher o segmento</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo5">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">5</span>
+          <h3>Base e validação dos cálculos</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Conferência técnica</div>
+          <ul>
+            <li>A <strong>Base</strong> normalmente já vem correta, mas verifique com atenção.</li>
+            <li>Se a região tiver <strong>base reduzida</strong>, ajuste a base <strong>manualmente</strong>.</li>
+            <li>Passe o mouse em <strong>Min / Média / Máx</strong> para conferir valores e cálculo.</li>
+          </ul>
+          <div class="callout">
+            <strong>Check rápido:</strong> base errada gera cores e valores errados, mesmo com KML correto.
+          </div>
+        </div>
+        <figure>
+          <img src="assets/tutorial/05_base_calculo.png" alt="Passo 5: Base e cálculo" />
+          <figcaption>① Ajuste da Base • ② Hover em Min/Média/Máx</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo6">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">6</span>
+          <h3>Pintura automática do mapa</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Aplicação no mapa</div>
+          <ul>
+            <li>Clique em <strong>Aplicar ao mapa</strong> para pintar automaticamente.</li>
+            <li>Confira <strong>Pintadas</strong>: precisa bater com o total de regiões.</li>
+            <li>Clique em uma região e valide o <strong>Valor</strong> no pop-up.</li>
+            <li>Confirme se a cor bate com <strong>Min / Média / Máx</strong>.</li>
+          </ul>
+          <div class="callout">
+            <strong>Se “Pintadas” não bater:</strong> revise nomes dos KMLs e o caso/segmento selecionado.
+          </div>
+        </div>
+        <figure>
+          <img src="assets/tutorial/06_pintura.png" alt="Passo 6: Pintura automática" />
+          <figcaption>① Aplicar ao mapa • ② Checar “Pintadas”</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo7">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">7</span>
+          <h3>Numeração: inserir e ajustar</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Acabamento visual</div>
+          <ul>
+            <li>Vá para <strong>5) Numeração</strong> e preencha AP1, AP2, … conforme a <strong>legenda do relatório</strong>.</li>
+            <li>Revise <strong>tamanho</strong> e <strong>posição</strong> para evitar sobreposição.</li>
+            <li>Se necessário, volte em <strong>Configurações visuais</strong> e ajuste <strong>Tamanho dos números</strong>.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/tutorial/07_numeracao.png" alt="Passo 7: Numeração" />
+          <figcaption>① Inserir números • ② Conferir visualmente</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo8">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">8</span>
+          <h3>Fila de mapas e exportação para PPTX</h3>
+        </div>
+      </div>
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Saída final</div>
+          <ul>
+            <li>Clique em <strong>Carregar logo</strong> e selecione <strong>Pesquisa e Dados</strong>.</li>
+            <li>Após finalizar um mapa, clique em <strong>Adicionar à fila</strong>.</li>
+            <li>Repita o processo para cada caso solicitado.</li>
+            <li>Se algo estiver errado, use <strong>Remover</strong> para tirar da fila.</li>
+            <li>Quando tudo estiver ok, clique em <strong>Exportar PPTX</strong>.</li>
+          </ul>
+          <div class="callout">
+            <strong>Checklist:</strong> Pintadas ok • cores conferidas • numeração ok • logo carregada • fila completa.
+          </div>
+        </div>
+        <figure>
+          <img src="assets/tutorial/08_fila_exportacao.png" alt="Passo 8: Fila e exportação" />
+          <figcaption>① Logo • ② Adicionar • ③ Exportar • ④ Remover</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="resultado">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">✓</span>
+          <h3>Exemplo de resultado esperado</h3>
+        </div>
+      </div>
+
+      <div class="textPane" style="margin-bottom:16px;">
+        <div class="small-label">Resultado final</div>
+        <ul>
+          <li>Mapa pintado com as regiões corretas.</li>
+          <li>Números legíveis e posicionados.</li>
+          <li>Fundo Satélite (Esri) com opacidade 83.</li>
+        </ul>
+      </div>
+
+      <details class="faq">
+        <summary>Problemas comuns (e como resolver)</summary>
+        <div>
+          <ul>
+            <li><strong>Região não pinta / “Pintadas” menor:</strong> nome do KML diferente do relatório ou KML faltando.</li>
+            <li><strong>Cores estranhas:</strong> caso/segmento errado ou base incorreta.</li>
+            <li><strong>Números ilegíveis:</strong> aumentar o tamanho, reduzir bordas ou reposicionar.</li>
+            <li><strong>Não encontro a tabela no relatório:</strong> use o <strong>Header</strong> para ir direto ao início.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div style="margin-top:16px">
+        <figure>
+          <img src="assets/tutorial/09_resultado_exemplo.jpg" alt="Exemplo do mapa pronto no aplicativo" />
+          <figcaption>Referência visual do mapa final dentro do aplicativo</figcaption>
+        </figure>
+      </div>
+
+      <small class="muted" style="display:block;margin-top:12px">
+        Dica técnica: ao usar QWebEngineView com HTML inline, configure o <span class="mono">baseUrl</span>
+        apontando para a pasta que contém <span class="mono">assets/</span>.
+      </small>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>

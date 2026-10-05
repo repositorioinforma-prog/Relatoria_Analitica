@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guia — Cruzamentos (Tabelas) (passo a passo)</title>
+  <style>
+    :root{
+      --bg:#edf3f8;
+      --card:#ffffff;
+      --text:#1a2433;
+      --muted:#5c6b7a;
+      --blue:#2f90e8;
+      --blue-dark:#0d5db8;
+      --blue-soft:#eaf5ff;
+      --green:#22b455;
+      --green-dark:#16803b;
+      --line:#d9e6f2;
+      --shadow:0 10px 28px rgba(16, 48, 87, 0.08);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+      --radius-pill:999px;
+    }
+
+    *{box-sizing:border-box}
+
+    html, body{
+      height:100%;
+      margin:0;
+      scroll-behavior:smooth;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(180deg, #f4f8fc 0%, #edf3f8 100%);
+      color:var(--text);
+      line-height:1.55;
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns:520px 1fr;
+      min-height:100%;
+      gap:22px;
+      padding:22px;
+      max-width:1880px;
+      margin:0 auto;
+      align-items:start;
+    }
+
+    .panel{
+      position:sticky;
+      top:18px;
+      align-self:start;
+    }
+
+    .hero,
+    .box,
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      border-radius:var(--radius-xl);
+      padding:26px 26px 22px;
+      margin-bottom:18px;
+    }
+
+    .panel h1{
+      margin:0 0 12px;
+      font-size:28px;
+      line-height:1.15;
+      font-weight:900;
+      color:#101820;
+      letter-spacing:-0.02em;
+    }
+
+    .intro{
+      margin:0;
+      font-size:15px;
+      color:#4f5f6f;
+      max-width:440px;
+    }
+
+    .box{
+      border-radius:var(--radius-xl);
+      padding:22px;
+      margin-bottom:18px;
+    }
+
+    .box h2{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 16px;
+      font-size:18px;
+      font-weight:900;
+      color:var(--blue-dark);
+    }
+
+    .box h2::before{
+      content:"";
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--blue), #59c0ff);
+      box-shadow:0 0 0 6px rgba(47, 144, 232, 0.10);
+      flex:0 0 auto;
+    }
+
+    .box ul{margin:0;padding-left:22px}
+    .box li{margin:12px 0;font-size:15px;color:#334255}
+
+    .mono{
+      display:inline-block;
+      padding:3px 12px;
+      border-radius:var(--radius-pill);
+      background:#fff;
+      border:1px solid #dbe7f2;
+      box-shadow:0 2px 5px rgba(0,0,0,0.04);
+      color:#1d2a39;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:12px;
+      vertical-align:middle;
+      white-space:nowrap;
+    }
+
+    .callout{
+      margin-top:16px;
+      background:linear-gradient(135deg, #22b455 0%, #1c9a49 100%);
+      color:#06240b;
+      border-radius:20px;
+      padding:16px 18px;
+      font-size:14px;
+      border:1px solid rgba(255,255,255,0.55);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .callout strong{color:#06240b}
+
+    .toc{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:0;
+    }
+
+    .toc a{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:12px 18px;
+      border-radius:var(--radius-pill);
+      border:1px solid #d8e5f0;
+      background:#fff;
+      color:#1f2937;
+      font-size:14px;
+      font-weight:600;
+      text-decoration:none;
+      transition:all .15s ease;
+      box-shadow:0 4px 10px rgba(20, 63, 111, 0.05);
+    }
+
+    .toc a:hover{
+      transform:translateY(-2px);
+      border-color:#b9d8f4;
+      background:#f8fcff;
+      box-shadow:0 8px 18px rgba(20, 63, 111, 0.10);
+    }
+
+    .muted{
+      color:#556476;
+      font-size:13px;
+    }
+
+    .content{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .card{
+      scroll-margin-top:24px;
+      border-radius:28px;
+      padding:16px;
+      overflow:hidden;
+    }
+
+    .cardHead{
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      border-radius:20px;
+      padding:14px 16px;
+      background:linear-gradient(135deg, #22b455 0%, #1b9a49 100%);
+      color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.20);
+      margin-bottom:16px;
+    }
+
+    .cardTitle{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .stepnum{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#eef7ff;
+      color:var(--blue-dark);
+      font-size:22px;
+      font-weight:900;
+      flex:0 0 auto;
+      box-shadow:0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h3{
+      margin:0;
+      font-size:19px;
+      font-weight:900;
+      color:#fff;
+      letter-spacing:-0.01em;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns:1.05fr 0.95fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .textPane{
+      background:linear-gradient(180deg, #f4fbff 0%, #eef7ff 100%);
+      border:1px solid #d9ebfb;
+      border-radius:22px;
+      padding:22px 22px 18px;
+    }
+
+    .small-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      color:var(--blue-dark);
+      font-size:12px;
+      font-weight:800;
+      border:1px solid #d4e8fb;
+    }
+
+    .textPane ul{margin:0;padding-left:24px}
+    .textPane li{margin:12px 0;font-size:15px;color:#274158}
+    .textPane strong{color:var(--blue-dark)}
+
+    figure{
+      margin:0;
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      border:1px solid #dce9f3;
+      border-radius:24px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:310px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+
+    figure img{
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      border-radius:16px;
+      display:block;
+      background:#fff;
+      border:1px solid #e2ecf5;
+      box-shadow:0 8px 18px rgba(26, 62, 99, 0.08);
+    }
+
+    figcaption{
+      padding-top:12px;
+      font-size:13px;
+      color:#617286;
+    }
+
+    details.faq{
+      margin-top:12px;
+      border:1px solid #dce9f3;
+      border-radius:18px;
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      overflow:hidden;
+    }
+
+    details.faq summary{
+      cursor:pointer;
+      padding:14px 16px;
+      font-weight:900;
+      color:var(--blue-dark);
+      list-style:none;
+    }
+
+    details.faq summary::-webkit-details-marker{display:none}
+
+    details.faq > div{
+      padding:0 16px 16px;
+      color:#2d4257;
+    }
+
+    details.faq li{color:#2d4257}
+    details.faq strong{color:#1a2433}
+
+    @media (max-width: 1280px){
+      .app{grid-template-columns:1fr}
+      .panel{position:static}
+    }
+
+    @media (max-width: 980px){
+      .app{padding:14px;gap:16px}
+      .split{grid-template-columns:1fr}
+      .hero,.box,.card{border-radius:20px}
+      .panel h1{font-size:24px}
+      .card h3{font-size:17px}
+      figure{min-height:220px}
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <aside class="panel">
+    <section class="hero">
+      <h1>Guia — Cruzamentos (Tabelas)</h1>
+      <p class="intro">
+        Passo a passo para gerar cruzamentos, ordenar linhas e colunas, montar a pilha
+        e exportar Excel dentro do aplicativo.
+      </p>
+    </section>
+
+    <section class="box">
+      <h2>Pré-requisitos</h2>
+      <ul>
+        <li>Banco do projeto importado com <strong>peso</strong> em <span class="mono">SPSS</span> ou <span class="mono">CSV</span>.</li>
+        <li>O <strong>Peso</strong> é obrigatório no seu fluxo.</li>
+        <li>Tenha o <strong>Relatório Descritivo Quantitativo</strong> aberto para copiar a ordem correta de linhas e colunas.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Regra do processo:</strong> sempre usar <strong>Peso</strong> e só exportar depois de ajustar ordem, remoções e título para ficar igual ao relatório.
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>Sumário</h2>
+      <nav class="toc" aria-label="Sumário">
+        <a href="#passo1">1) Importar banco</a>
+        <a href="#passo2">2) Configurar variáveis + Peso</a>
+        <a href="#passo3">3) Gerar cruzamentos</a>
+        <a href="#passo4">4) Ajustar tabela</a>
+        <a href="#passo5">5) Adicionar à pilha</a>
+        <a href="#passo6">6) Exportar Excel</a>
+        <a href="#resultado">Resultado</a>
+      </nav>
+    </section>
+  </aside>
+
+  <main class="content">
+
+    <section class="card" id="passo1">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">1</span>
+          <h3>Importar o banco com peso do SPSS</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Etapa inicial</div>
+          <ul>
+            <li>Em <strong>Dados</strong>, clique em <strong>Carregar dados (CSV/XLSX/SAV)</strong>.</li>
+            <li>Selecione o banco do projeto em SPSS ou outro formato com peso.</li>
+            <li>Confira se o nome do arquivo aparece corretamente como carregado.</li>
+          </ul>
+        </div>
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo1_importar_banco.jpg" alt="Passo 1: Importar banco com peso do SPSS" />
+          <figcaption>0) Dados — Importar banco</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo2">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">2</span>
+          <h3>Configurar variáveis e selecionar Peso</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Configuração principal</div>
+          <ul>
+            <li>Em <strong>Variável (Linhas)</strong>, selecione a variável desejada.</li>
+            <li>Em <strong>Peso</strong>, selecione <strong>Peso</strong>.</li>
+            <li>Deixe <strong>Percentual</strong> como está, no padrão do projeto.</li>
+            <li>Em <strong>Variável (Colunas)</strong>, escolha a outra variável do cruzamento.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Check rápido:</strong> se “Peso” não aparecer, revise o nome da coluna. Ela precisa conter “peso”.
+          </div>
+        </div>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo2_config_variaveis.jpg" alt="Passo 2: Configurações das variáveis" />
+          <figcaption>Linhas, Peso e Colunas</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo3">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">3</span>
+          <h3>Gerar cruzamentos</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Geração da tabela</div>
+          <ul>
+            <li>Após selecionar Linhas, Peso e Colunas, clique em <strong>Gerar cruzamentos</strong>.</li>
+            <li>A tabela aparece no painel da direita com título, base e botões de ajuste.</li>
+            <li>Confira a <strong>Base (N)</strong> antes de ordenar ou remover itens.</li>
+          </ul>
+        </div>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo3_gerar_cruzamentos.jpg" alt="Passo 3: Gerar cruzamentos" />
+          <figcaption>Resultado aparece na área de resultados</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo4">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">4</span>
+          <h3>Ajustar a tabela: título e ordem</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Padronização antes da pilha</div>
+          <ul>
+            <li><strong>Título:</strong> revise ou ajuste o título da tabela.</li>
+            <li><strong>Ordenar linhas:</strong> deixe igual ao Relatório Descritivo Quantitativo.</li>
+            <li><strong>Ordenar colunas:</strong> ajuste na mesma ordem do relatório.</li>
+            <li><strong>Remover colunas sem base:</strong> remova todas as colunas sem base, exceto a coluna do cliente.</li>
+            <li>Clique em <strong>Salvar</strong> nas modais para aplicar as alterações.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Regra do projeto:</strong> linhas e colunas devem bater com o relatório antes de ir para a pilha.
+          </div>
+        </div>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo4_ajustar_titulo.jpg" alt="Passo 4: Ajustar título" />
+          <figcaption>Antes da pilha: ajuste título e padronize a tabela</figcaption>
+        </figure>
+      </div>
+
+      <div class="split" style="margin-top:18px;">
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo4_ordenar_linhas.jpg" alt="Ordenar linhas" />
+          <figcaption>Ordenar linhas</figcaption>
+        </figure>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo4_ordenar_colunas_remover.jpg" alt="Ordenar/remover colunas" />
+          <figcaption>Ordenar e remover colunas sem base</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo5">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">5</span>
+          <h3>Adicionar à pilha</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Fila de exportação</div>
+          <ul>
+            <li>Com a tabela ajustada, clique em <strong>Adicionar à pilha</strong>.</li>
+            <li>Confira no painel de exportação se a fila aumentou.</li>
+            <li>Repita o processo para todos os cruzamentos solicitados.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Dica:</strong> use <strong>Adicionar todos</strong> apenas depois que tudo estiver revisado.
+          </div>
+        </div>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo5_adicionar_pilha.jpg" alt="Passo 5: Adicionar à pilha" />
+          <figcaption>Adicionar à pilha para exportação em lote</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="passo6">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">6</span>
+          <h3>Exportar Excel</h3>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="textPane">
+          <div class="small-label">Finalização</div>
+          <ul>
+            <li>Quando todos os cruzamentos estiverem na pilha, clique em <strong>Exportar Excel</strong>.</li>
+            <li>Se precisar, use <strong>Limpar pilha</strong> para recomeçar.</li>
+            <li>Se algum item estiver errado, remova da fila antes de exportar.</li>
+          </ul>
+
+          <div class="callout">
+            <strong>Checklist:</strong> Peso selecionado • ordem igual ao relatório • colunas sem base removidas • pilha completa.
+          </div>
+        </div>
+
+        <figure>
+          <img src="assets/tutorial/cruzamentos/passo6_exportar_excel.jpg" alt="Passo 6: Exportação para Excel" />
+          <figcaption>Exportação final pela pilha</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card" id="resultado">
+      <div class="cardHead">
+        <div class="cardTitle">
+          <span class="stepnum">✓</span>
+          <h3>Resultado esperado</h3>
+        </div>
+      </div>
+
+      <div class="textPane" style="margin-bottom:16px;">
+        <div class="small-label">Resultado final</div>
+        <ul>
+          <li>Cruzamentos gerados com <strong>Peso</strong> selecionado.</li>
+          <li>Linhas e Colunas na mesma ordem do relatório.</li>
+          <li>Colunas sem base removidas, mantendo a coluna do cliente.</li>
+          <li>Exportação em Excel feita pela pilha, com o arquivo final completo.</li>
+        </ul>
+      </div>
+
+      <details class="faq">
+        <summary>Problemas comuns (e como resolver)</summary>
+        <div>
+          <ul>
+            <li><strong>Peso não aparece:</strong> confirme se a coluna do peso contém “peso” no nome e está numérica.</li>
+            <li><strong>Ordem diferente do relatório:</strong> use “Ordenar linhas” e “Ordenar colunas”.</li>
+            <li><strong>Colunas sem base:</strong> remova na modal de colunas, exceto a coluna do cliente.</li>
+            <li><strong>Exportação errada:</strong> remova o item da pilha e gere novamente após corrigir a tabela.</li>
+          </ul>
+        </div>
+      </details>
+
+      <small class="muted" style="display:block;margin-top:12px">
+        Dica técnica: ao usar QWebEngineView com HTML inline, configure o <span class="mono">baseUrl</span>
+        apontando para a pasta que contém <span class="mono">assets/</span>.
+      </small>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guia — Matriz de Correlação</title>
+  <style>
+    :root{
+      --bg:#edf3f8;
+      --card:#ffffff;
+      --text:#1a2433;
+      --muted:#5c6b7a;
+      --blue:#2f90e8;
+      --blue-dark:#0d5db8;
+      --blue-soft:#eaf5ff;
+      --green:#22b455;
+      --green-dark:#16803b;
+      --line:#d9e6f2;
+      --shadow:0 10px 28px rgba(16, 48, 87, 0.08);
+      --radius-xl:24px;
+      --radius-lg:18px;
+      --radius-md:14px;
+      --radius-pill:999px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      padding:0;
+      background:linear-gradient(180deg, #f4f8fc 0%, #edf3f8 100%);
+      color:var(--text);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      line-height:1.55;
+    }
+
+    .page{
+      max-width:1880px;
+      margin:0 auto;
+      padding:22px;
+      display:grid;
+      grid-template-columns: 520px 1fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    .left{
+      position:sticky;
+      top:18px;
+      align-self:start;
+    }
+
+    .hero{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      padding:26px 26px 22px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+
+    .title{
+      margin:0 0 12px 0;
+      font-size:28px;
+      line-height:1.15;
+      font-weight:900;
+      color:#101820;
+      letter-spacing:-0.02em;
+    }
+
+    .intro{
+      margin:0;
+      font-size:15px;
+      color:#4f5f6f;
+      max-width:440px;
+    }
+
+    .side-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      padding:22px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
+
+    .side-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 16px 0;
+      font-size:18px;
+      font-weight:900;
+      color:var(--blue-dark);
+    }
+
+    .side-title .dot{
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--blue), #59c0ff);
+      box-shadow:0 0 0 6px rgba(47, 144, 232, 0.10);
+      flex:0 0 auto;
+    }
+
+    .side-card ul{
+      margin:0;
+      padding-left:22px;
+    }
+
+    .side-card li{
+      margin:12px 0;
+      font-size:15px;
+      color:#334255;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:3px 12px;
+      border-radius:var(--radius-pill);
+      background:#fff;
+      border:1px solid #dbe7f2;
+      box-shadow:0 2px 5px rgba(0,0,0,0.04);
+      color:#1d2a39;
+      font-size:12px;
+      vertical-align:middle;
+    }
+
+    .tip-box{
+      margin-top:16px;
+      background:linear-gradient(135deg, #22b455 0%, #1c9a49 100%);
+      color:#06240b;
+      border-radius:20px;
+      padding:16px 18px;
+      font-size:14px;
+      border:1px solid rgba(255,255,255,0.55);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .chip{
+      display:inline-block;
+      text-decoration:none;
+      background:#fff;
+      color:#1f2937;
+      border:1px solid #d8e5f0;
+      border-radius:var(--radius-pill);
+      padding:12px 18px;
+      font-size:14px;
+      font-weight:600;
+      transition:all .15s ease;
+      box-shadow:0 4px 10px rgba(20, 63, 111, 0.05);
+    }
+
+    .chip:hover{
+      transform:translateY(-2px);
+      border-color:#b9d8f4;
+      background:#f8fcff;
+      box-shadow:0 8px 18px rgba(20, 63, 111, 0.10);
+    }
+
+    .chip:active{
+      transform:translateY(0);
+    }
+
+    .obs{
+      margin:2px 4px 0;
+      font-size:13px;
+      color:#556476;
+    }
+
+    .code-pill{
+      display:inline-block;
+      padding:2px 10px;
+      border-radius:var(--radius-pill);
+      background:#fff;
+      border:1px solid #d9e1ea;
+      font-family:Consolas, monospace;
+      font-size:12px;
+      color:#1c2630;
+    }
+
+    .steps{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .step{
+      scroll-margin-top:24px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:16px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .step-head{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border-radius:20px;
+      padding:14px 16px;
+      background:linear-gradient(135deg, #22b455 0%, #1b9a49 100%);
+      color:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.20);
+      margin-bottom:16px;
+    }
+
+    .badge{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:#eef7ff;
+      color:var(--blue-dark);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      font-weight:900;
+      flex:0 0 auto;
+      box-shadow:0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .step-title{
+      font-size:19px;
+      font-weight:900;
+      letter-spacing:-0.01em;
+    }
+
+    .step-grid{
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .step-text{
+      background:linear-gradient(180deg, #f4fbff 0%, #eef7ff 100%);
+      border:1px solid #d9ebfb;
+      border-radius:22px;
+      padding:22px 22px 18px;
+    }
+
+    .step-text ul{
+      margin:0;
+      padding-left:24px;
+    }
+
+    .step-text li{
+      margin:12px 0;
+      font-size:15px;
+      color:#274158;
+    }
+
+    .step-text strong{
+      color:var(--blue-dark);
+    }
+
+    .step-note{
+      margin-top:16px;
+      background:linear-gradient(135deg, #22b455 0%, #1c9a49 100%);
+      color:#04220a;
+      border:1px solid rgba(255,255,255,0.55);
+      border-radius:20px;
+      padding:15px 16px;
+      font-size:14px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.30);
+    }
+
+    .img-card{
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      border:1px solid #dce9f3;
+      border-radius:24px;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:310px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+
+    .img-card img{
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      border-radius:16px;
+      display:block;
+      background:#fff;
+      border:1px solid #e2ecf5;
+      box-shadow:0 8px 18px rgba(26, 62, 99, 0.08);
+    }
+
+    .result-box{
+      background:linear-gradient(180deg, #fbfdff 0%, #f5f9fd 100%);
+      border:1px solid #dce9f3;
+      border-radius:22px;
+      padding:22px;
+    }
+
+    .result-box h3{
+      margin:0 0 12px 0;
+      font-size:20px;
+      font-weight:900;
+      color:var(--blue-dark);
+    }
+
+    .result-box ul{
+      margin:0;
+      padding-left:22px;
+    }
+
+    .result-box li{
+      margin:10px 0;
+      color:#2e4358;
+      font-size:15px;
+    }
+
+    .small-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      color:var(--blue-dark);
+      font-size:12px;
+      font-weight:800;
+      border:1px solid #d4e8fb;
+    }
+
+    @media (max-width: 1280px){
+      .page{
+        grid-template-columns:1fr;
+      }
+
+      .left{
+        position:static;
+      }
+    }
+
+    @media (max-width: 900px){
+      .page{
+        padding:14px;
+        gap:16px;
+      }
+
+      .hero,
+      .side-card,
+      .step{
+        border-radius:20px;
+      }
+
+      .step-grid{
+        grid-template-columns:1fr;
+      }
+
+      .title{
+        font-size:24px;
+      }
+
+      .step-title{
+        font-size:17px;
+      }
+
+      .img-card{
+        min-height:220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <aside class="left">
+      <section class="hero">
+        <h1 class="title">Guia — Matriz de Correlação</h1>
+        <p class="intro">
+          Passo a passo para importar a base, definir o peso, tratar missing,
+          renomear variáveis, calcular a matriz e exportar CSV/XLSX dentro do aplicativo.
+        </p>
+      </section>
+
+      <section class="side-card">
+        <h2 class="side-title"><span class="dot"></span>Pré-requisitos</h2>
+        <ul>
+          <li>Banco do projeto em <span class="pill">CSV</span>, <span class="pill">XLSX</span> ou <span class="pill">SAV</span>.</li>
+          <li>O arquivo precisa ter uma variável de <strong>peso</strong>.</li>
+          <li>Selecione pelo menos <strong>2 colunas</strong> para montar a matriz.</li>
+          <li>Se houver códigos como 98, 99, “não sabe” ou campos vazios, configure isso em <strong>Missing</strong>.</li>
+          <li>Revise os nomes das variáveis antes de exportar o arquivo final.</li>
+        </ul>
+
+        <div class="tip-box">
+          <strong>Regra prática:</strong> primeiro importe a base, confirme o peso e revise os missing.
+          Depois ajuste nomes, método e exportação.
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h2 class="side-title"><span class="dot"></span>Sumário</h2>
+        <div class="chips">
+          <a class="chip" href="#passo1">1) Importar banco</a>
+          <a class="chip" href="#passo2">2) Definir peso</a>
+          <a class="chip" href="#passo3">3) Selecionar colunas</a>
+          <a class="chip" href="#passo4">4) Configurar missing</a>
+          <a class="chip" href="#passo5">5) Ajustar nomes</a>
+          <a class="chip" href="#passo6">6) Escolher método</a>
+          <a class="chip" href="#passo7">7) Calcular e conferir</a>
+          <a class="chip" href="#passo8">8) Exportar CSV/XLSX</a>
+          <a class="chip" href="#resultado">Resultado</a>
+        </div>
+      </section>
+
+      <p class="obs">
+        Observação: coloque as imagens em
+        <span class="code-pill">assets/tutorial/correlacao/</span>
+        e use a <span class="code-pill">baseUrl</span> apontando para a raiz que contém
+        <span class="code-pill">assets/</span>.
+      </p>
+    </aside>
+
+    <main class="steps">
+
+      <section class="step" id="passo1">
+        <div class="step-head">
+          <div class="badge">1</div>
+          <div class="step-title">Importar banco de dados</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Etapa inicial</div>
+            <ul>
+              <li>Clique em <strong>Importar CSV/XLSX/SAV</strong>.</li>
+              <li>Selecione a base que será usada na análise.</li>
+              <li>Depois da carga, o sistema identifica as colunas candidatas e mostra o arquivo importado.</li>
+              <li>Se a base vier do SPSS, os rótulos podem ser aproveitados depois.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> use a versão final da base para não precisar refazer
+              configurações de missing, nomes e método.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/01-importar.png" alt="Passo 1 - Importar banco">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo2">
+        <div class="step-head">
+          <div class="badge">2</div>
+          <div class="step-title">Definir a variável de peso</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Obrigatório</div>
+            <ul>
+              <li>Na caixa <strong>Variável de peso</strong>, selecione a coluna correta.</li>
+              <li>O sistema tenta priorizar colunas com “peso” no nome.</li>
+              <li>Se nenhuma aparecer automaticamente, escolha manualmente na lista.</li>
+              <li>Sem peso, o cálculo não conclui.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> confira o peso antes de seguir,
+              porque uma escolha errada altera toda a leitura da matriz.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/02-peso.png" alt="Passo 2 - Selecionar peso">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo3">
+        <div class="step-head">
+          <div class="badge">3</div>
+          <div class="step-title">Selecionar as colunas da matriz</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Escolha das variáveis</div>
+            <ul>
+              <li>Marque as variáveis que entrarão na correlação.</li>
+              <li>Você pode usar <strong>Todos</strong>, <strong>Nenhum</strong> e <strong>Buscar</strong>.</li>
+              <li>O contador ajuda a conferir quantas variáveis estão selecionadas.</li>
+              <li>É obrigatório marcar pelo menos <strong>2 variáveis</strong>.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> comece com poucas variáveis para validar o resultado
+              e depois amplie a matriz.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/03-missing.png" alt="Passo 3 - Selecionar colunas">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo4">
+        <div class="step-head">
+          <div class="badge">4</div>
+          <div class="step-title">Configurar missing values</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Tratamento de valores</div>
+            <ul>
+              <li>Escolha uma variável selecionada no campo de missing.</li>
+              <li>Clique em <strong>Carregar valores</strong> para ver os valores únicos.</li>
+              <li>Marque os valores que devem ser tratados como missing.</li>
+              <li>Você também pode usar um <strong>missing manual global</strong>.</li>
+              <li>Use <strong>Todos</strong>, <strong>Nenhum</strong> ou <strong>Limpar</strong> quando precisar.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> trate aqui códigos como 98, 99, recusa,
+              não sabe e vazios, para não contaminar a correlação.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/03-missing.png" alt="Passo 4 - Configurar missing">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo5">
+        <div class="step-head">
+          <div class="badge">5</div>
+          <div class="step-title">Ajustar nomes das variáveis</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Organização visual</div>
+            <ul>
+              <li>Na área de <strong>Nomes</strong>, renomeie as variáveis selecionadas.</li>
+              <li>Também é possível ajustar nomes depois pelo cabeçalho da tabela.</li>
+              <li>Se a base vier do SPSS, você pode aproveitar os rótulos originais.</li>
+              <li>Os nomes ajustados melhoram a leitura e a exportação.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> substitua nomes técnicos por rótulos claros,
+              como “Idade”, “Renda familiar” e “Avaliação”.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/04-nomes.png" alt="Passo 5 - Ajustar nomes">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo6">
+        <div class="step-head">
+          <div class="badge">6</div>
+          <div class="step-title">Escolher método e configurações</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Configuração do cálculo</div>
+            <ul>
+              <li>Em <strong>Método</strong>, escolha <strong>Pearson</strong>, <strong>Spearman</strong> ou <strong>Kendall</strong>.</li>
+              <li>Defina o número de <strong>casas decimais</strong>.</li>
+              <li>Ative a opção de converter texto em número quando necessário.</li>
+              <li>Revise tudo antes de calcular.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> use Pearson como padrão para variáveis contínuas
+              e Spearman/Kendall quando a análise pedir outra abordagem.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/05-configuracoes.png" alt="Passo 6 - Configurações do cálculo">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo7">
+        <div class="step-head">
+          <div class="badge">7</div>
+          <div class="step-title">Calcular e conferir a matriz</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Validação do resultado</div>
+            <ul>
+              <li>Clique em <strong>Calcular</strong>.</li>
+              <li>O sistema valida peso, número mínimo de colunas e missing configurados.</li>
+              <li>Depois do processamento, a matriz aparece com destaque visual nas células.</li>
+              <li>Confira sinais, magnitudes e coerência substantiva dos resultados.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> se algo parecer estranho,
+              revise peso, missing e colunas selecionadas antes de exportar.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/06-exportar.png" alt="Passo 7 - Conferir matriz">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="passo8">
+        <div class="step-head">
+          <div class="badge">8</div>
+          <div class="step-title">Exportar CSV ou XLSX</div>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-text">
+            <div class="small-label">Saída final</div>
+            <ul>
+              <li>Depois de calcular, use <strong>Exportar CSV</strong> ou <strong>Exportar XLSX</strong>.</li>
+              <li>Sem resultado calculado, a exportação fica bloqueada.</li>
+              <li>O CSV sai pronto para reaproveitamento em outros fluxos.</li>
+              <li>O XLSX sai melhor formatado para leitura e apresentação.</li>
+            </ul>
+
+            <div class="step-note">
+              <strong>Boa prática:</strong> use XLSX para entrega final
+              e CSV quando quiser reutilizar os dados em outro fluxo.
+            </div>
+          </div>
+
+          <div class="img-card">
+            <img src="assets/tutorial/correlacao/06-exportar.png" alt="Passo 8 - Exportar resultados">
+          </div>
+        </div>
+      </section>
+
+      <section class="step" id="resultado">
+        <div class="step-head">
+          <div class="badge">R</div>
+          <div class="step-title">Resultado esperado</div>
+        </div>
+
+        <div class="result-box">
+          <h3>Ao final, você deve ter:</h3>
+          <ul>
+            <li>uma matriz de correlação consistente com o peso selecionado;</li>
+            <li>missing tratados antes do cálculo;</li>
+            <li>nomes claros para leitura e exportação;</li>
+            <li>método e casas decimais definidos;</li>
+            <li>arquivo final exportado em CSV ou XLSX.</li>
+          </ul>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
