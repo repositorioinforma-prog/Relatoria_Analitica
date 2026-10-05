@@ -1,0 +1,9 @@
+PySide6
+numpy
+pandas
+scipy
+openpyxl
+xlrd
+pyreadstat
+python-pptx
+Pillow
